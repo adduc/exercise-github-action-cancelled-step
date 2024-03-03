@@ -7,9 +7,21 @@ jobs:
   job:
     runs-on: ubuntu-22.04
     steps:
-  
-      - run: echo "Step 1" && sleep 100
-      - id: critical_step
+
+      # This step is used to confirm that when a workflow is cancelled
+      # at this step, the handler for the critical step is not executed.
+      - name: Non-critical step
+        run: echo "Step 1" && sleep 100
+
+      # This step represents a critical action (e.g. deployment, etc.)
+      # that requires some form of cleanup if the workflow is cancelled.
+      - name: Critical step
+        id: critical_step
         run: echo "Step 2" && sleep 100
-      - if: cancelled() && steps.critical_step.outcome == 'cancelled'
+
+      # This step is used to confirm that when a workflow is cancelled
+      # during the critical step, a handler can be defined to execute
+      # some form of cleanup.
+      - name: Handler for cancelled critical step
+        if: cancelled() && steps.critical_step.outcome == 'cancelled'
         run: echo "This job is running because the critical step was cancelled"
