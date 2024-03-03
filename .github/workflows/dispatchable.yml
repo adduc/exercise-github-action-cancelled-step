@@ -1,0 +1,14 @@
+name: Dispatchable Workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  runs-on: ubuntu-22.04
+  steps:
+
+    - run: echo "Step 1" && sleep 100
+    - id: critical_step
+      run: echo "Step 2" && sleep 100
+    - if: cancelled() && steps.critical_step.outcome == 'cancelled'
+      run: echo "This job is running because the critical step was cancelled"
